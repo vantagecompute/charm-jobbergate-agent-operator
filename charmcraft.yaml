@@ -1,0 +1,112 @@
+# Copyright (c) 2025 Vantage Compute Corporation
+# See LICENSE file for licensing details.
+name: jobbergate-agent
+summary: |
+  The agent component of [jobbergate](https://github.com/omnivector-solutions/jobbergate)
+
+description: |
+  Deploy jobbergate-agent as a charmed operator.
+
+links:
+  contact: https://matrix.to/#/#hpc:ubuntu.com
+
+  issues:
+  - https://github.com/vantagecompute/charm-jobbergate-agent-operator/issues
+
+  source:
+  - https://github.com/vantagecompute/charm-jobbergate-agent-operator
+
+type: charm
+base: ubuntu@24.04
+platforms:
+  amd64:
+
+assumes:
+  - juju
+
+subordinate: true
+
+requires:
+  juju-info:
+    interface: juju-info
+    scope: container
+
+parts:
+  charm: {}
+
+config:
+  options:
+    snap-channel:
+      type: string
+      default: "stable"
+      description: |
+        Snap channel to install from.
+    # Resource URLs
+    base-api-url:
+      type: string
+      default: "https://apis.vantagecompute.ai"
+      description: |
+        The base api url.
+    # Slurm related settings
+    sbatch-path:
+      type: string
+      default: /usr/bin/sbatch
+      description: |
+        Absolute path to the sbatch command
+    scontrol-path:
+      type: string
+      default: /usr/bin/scontrol
+      description: |
+        Absolute path to the scontrol command
+    # Auth related settings
+    oidc-domain:
+      type: string
+      default: "auth.vantagecompute.ai/realms/vantage"
+      description: |
+        OIDC provider domain
+    oidc-client-id:
+      type: string
+      default:
+      description: |
+        Client ID used to issue JWTs
+    oidc-client-secret:
+      type: string
+      default:
+      description: |
+        Secret to protect OIDC client resources
+    slurm-user-mapper:
+      type: string
+      default: 
+      description: |
+        Type of user-mapper to use.
+  
+    # Other settings
+    sentry-dsn:
+      type: string
+      default:
+      description: |
+        The client url for sending error events to sentry
+    write-submission-files:
+      type: boolean
+      default: true
+      description: |
+        Define if the job script files will be written to the submit directory
+  
+    # Tasks
+    task-jobs-interval-seconds:
+      type: int
+      default: 10
+      description: |
+        Seconds between the job task runs, to submit pending and check running jobs
+
+    task-garbage-collection-hour:
+      type: int
+      default: 12
+      description: |
+        Hour of the day when garbage-collection tasks should be triggered
+  
+
+actions:
+  get-jobbergate-env-config:
+    description: |
+      Return jobbergate-agent environment configuration.
